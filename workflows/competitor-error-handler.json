@@ -1,0 +1,61 @@
+{
+  "name": "Competitor Meta Ads — Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [-1968, 4096],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $json;\n\nconst workflowName = error.workflow?.name || 'Unknown Workflow';\nconst nodeName = error.execution?.lastNodeExecuted || 'Unknown Node';\nconst errorMessage = error.execution?.error?.message || 'No error message';\nconst executionId = error.execution?.id || 'N/A';\nconst timestamp = new Date().toISOString();\n\nconst message =\n  `❌ WORKFLOW ERROR\\n\\n` +\n  `📋 Workflow: ${workflowName}\\n` +\n  `🔴 Failed Node: ${nodeName}\\n` +\n  `💬 Error: ${errorMessage}\\n` +\n  `🆔 Execution ID: ${executionId}\\n` +\n  `🕐 Time: ${timestamp}`;\n\nreturn [{ json: { message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1728, 4096],
+      "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "name": "Format Error Message"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [-1488, 4096],
+      "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+      "name": "Error Alert",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Meta Ads Tracker"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [[{"node": "Format Error Message", "type": "main", "index": 0}]]
+    },
+    "Format Error Message": {
+      "main": [[{"node": "Error Alert", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": "REDACTED"
+  },
+  "id": "YOUR_ERROR_WORKFLOW_ID",
+  "tags": []
+}
