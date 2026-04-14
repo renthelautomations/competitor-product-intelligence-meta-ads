@@ -1,0 +1,477 @@
+{
+  "name": "Competitor Product Intelligence System - META ADS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "",
+        "height": 1856,
+        "width": 3280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-1968, 2272],
+      "typeVersion": 1,
+      "id": "287a52a4-13eb-4dcf-87cc-f3de136da205",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# **META ADS SCRAPER / AD WINNER ALERT AUTOMATION**\n",
+        "height": 96,
+        "width": 3280,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-1968, 2112],
+      "typeVersion": 1,
+      "id": "bf9b321c-b408-4e7e-a0de-7575aa6abcd9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/curious_coder~facebook-ads-library-scraper/runs?token=YOUR_APIFY_API_TOKEN",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [-1072, 2864],
+      "id": "d6037491-1779-4073-81c1-27da4aa44db7",
+      "name": "Scrape Meta Ads Apify1"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [{"hour": 8}]
+        }
+      },
+      "id": "f88d98a6-4269-4cb3-a5d9-66b0ce6200fd",
+      "name": "Daily Scraping - Run 9:00 AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [-1760, 2640]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "545c4eb4-9ff6-4f90-a399-a51ebd4b95ec", "name": "vitera", "value": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=NL&is_targeted_country=false&media_type=all&q=food&search_type=keyword_unordered&sort_data[direction]=desc&sort_data[mode]=total_impressions", "type": "string"},
+            {"id": "1f3574a6-c678-48bf-a029-dcae0b125b8a", "name": "netherlands", "value": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=NL&is_targeted_country=false&media_type=all&publisher_platforms[0]=facebook&q=netherlands&search_type=keyword_unordered&sort_data[direction]=desc&sort_data[mode]=total_impressions", "type": "string"},
+            {"id": "a46ddc8a-35ea-4a5a-8fac-be867534d87e", "name": "dogs", "value": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=NL&is_targeted_country=false&media_type=all&publisher_platforms[0]=facebook&q=dogs&search_type=keyword_unordered&sort_data[direction]=desc&sort_data[mode]=total_impressions", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-1536, 2640],
+      "id": "c89c1581-6e4e-450a-ae81-b1176e44e29b",
+      "name": "Meta Ads URL"
+    },
+    {
+      "parameters": {
+        "documentId": {"__rl": true, "value": "YOUR_GOOGLE_SHEET_ID", "mode": "list", "cachedResultName": "Meta Ads Detector", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "ads_db", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-1536, 2448],
+      "id": "8fe9379a-9d3a-4fad-a2f6-bfe8f03d06d0",
+      "name": "Read Database",
+      "credentials": {"googleSheetsOAuth2Api": {"id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID", "name": "Renthel"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json;\nconst urls = Object.entries(input).map(([key, value]) => ({ url: value, label: key }));\nreturn [{ json: { count: 10, scrapeAdDetails: true, \"scrapePageAds.activeStatus\": \"all\", \"scrapePageAds.countryCode\": \"ALL\", \"scrapePageAds.sortBy\": \"impressions_desc\", urls } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1280, 2864],
+      "id": "94c85465-b8bc-4123-b47d-b0bb4599c01a",
+      "name": "URL Merger"
+    },
+    {
+      "parameters": {"amount": 2, "unit": "minutes"},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [-832, 2864],
+      "id": "dad46a86-0c97-4c74-ad82-570b090c3f8b",
+      "name": "Wait 2 Mins",
+      "webhookId": "3934a0e9-0a0b-473c-892c-246502eb1007"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/curious_coder~facebook-ads-library-scraper/runs/last/dataset/items?token=YOUR_APIFY_API_TOKEN",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [-560, 2864],
+      "id": "e5690c20-9135-4392-b5f0-85191e54538f",
+      "name": "GET Apify Latest Run Dataset"
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  const ad = item.json;\n  const snap = ad.snapshot || {};\n  let landingUrl = \"\";\n  if (snap.link_url) { landingUrl = snap.link_url; }\n  else if (snap.call_to_action && snap.call_to_action.value && snap.call_to_action.value.link) { landingUrl = snap.call_to_action.value.link; }\n  if (landingUrl.includes(\"?\")) { landingUrl = landingUrl.split(\"?\")[0]; }\n  let rawDate = ad.start_date_formatted || \"\";\n  let formattedDate = rawDate ? rawDate.split(\" \")[0] : \"\";\n  const now = new Date();\n  const firstSeen = String(now.getMonth() + 1).padStart(2, \"0\") + \"/\" + String(now.getDate()).padStart(2, \"0\") + \"/\" + now.getFullYear();\n  let creativeType = \"UNKNOWN\";\n  if (snap.videos && snap.videos.length > 0) { creativeType = \"VIDEO\"; }\n  else if (snap.images && snap.images.length > 0) { creativeType = \"IMAGE\"; }\n  else { creativeType = \"TEXT\"; }\n  let isActive = false;\n  if (typeof ad.is_active === \"boolean\") { isActive = ad.is_active; }\n  else if (typeof ad.is_active === \"string\") { isActive = ad.is_active.toLowerCase() === \"true\"; }\n  else if (typeof ad.is_active === \"number\") { isActive = ad.is_active === 1; }\n  return { json: { ad_id: ad.ad_archive_id || \"\", page_name: snap.page_name || ad.page_name || ad.page_id || \"\", ad_url: ad.ad_archive_id ? `https://www.facebook.com/ads/library/?id=${ad.ad_archive_id}` : \"\", landing_url: landingUrl, start_date: formattedDate, first_seen: firstSeen, creative_type: creativeType, is_active: isActive, status: \"NEW\" } };\n});"
+      },
+      "id": "2692d64e-0222-4ed0-8cc5-6539b60a15e2",
+      "name": "Normalize Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [-256, 2864]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [-272, 2464],
+      "id": "b493af81-aa9b-40bf-9e64-e009b1c16b98",
+      "name": "Dataset Merger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst todayStr = String(today.getMonth() + 1).padStart(2, \"0\") + \"/\" + String(today.getDate()).padStart(2, \"0\") + \"/\" + today.getFullYear();\nconst existingAdIds = new Set();\nconst newAds = [];\nitems.forEach(item => {\n  const data = item.json;\n  if (data.row_number !== undefined) { if (data.ad_id) { existingAdIds.add(String(data.ad_id)); } }\n  else { newAds.push(data); }\n});\nconst seen = new Set();\nconst filtered = newAds.filter(ad => {\n  const id = String(ad.ad_id);\n  if (!id) return false;\n  if (!ad.is_active) return false;\n  const isExisting = existingAdIds.has(id);\n  if (isExisting && ad.first_seen !== todayStr) return false;\n  if (seen.has(id)) return false;\n  seen.add(id);\n  return true;\n});\nif (filtered.length === 0) { return [{ json: { message: \"No new ads (after manual edits).\" } }]; }\nreturn filtered.map(ad => ({ json: ad }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-32, 2464],
+      "id": "c1e4a65e-c83f-4f0d-bc70-7ab3245939c6",
+      "name": "Filter Node"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3},
+          "conditions": [{"id": "2ea906a0-d0ec-4fda-b81b-4d5cba4a8f14", "leftValue": "={{$items().length}}", "rightValue": 0, "operator": {"type": "number", "operation": "gt"}}],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [192, 2464],
+      "id": "3b9fc919-ca7c-4514-8f0d-ff74e556b6b1",
+      "name": "New Ad Detected?"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=NO NEW ADS TODAY\n\nNo new competitor ads were detected in today's scan.",
+        "additionalFields": {"appendAttribution": false}
+      },
+      "id": "ecdafeb9-721f-4ef7-b3c5-1a861355fca4",
+      "name": "No New Ads Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [192, 2864],
+      "webhookId": "d1acc4df-4f71-4506-8bcd-df33708663ea",
+      "credentials": {"telegramApi": {"id": "YOUR_TELEGRAM_CREDENTIAL_ID", "name": "Meta Ads Tracker"}}
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {"__rl": true, "value": "YOUR_GOOGLE_SHEET_ID", "mode": "list", "cachedResultName": "Meta Ads Detector", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "ads_db", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {"ad_id": "={{ $json.ad_id }}", "page_name": "={{ $json.page_name }}", "ad_url": "={{ $json.ad_url }}", "landing_url": "={{ $json.landing_url }}", "start_date": "={{ $json.start_date }}", "first_seen": "={{ $json.first_seen }}", "creative_type": "={{ $json.creative_type }}", "status": "NEW", "is_active": "={{ $json.is_active }}"},
+          "matchingColumns": ["ad_id"],
+          "schema": [
+            {"id": "ad_id", "displayName": "ad_id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "page_name", "displayName": "page_name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "ad_url", "displayName": "ad_url", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "landing_url", "displayName": "landing_url", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "start_date", "displayName": "start_date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "first_seen", "displayName": "first_seen", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "last_seen", "displayName": "last_seen", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "creative_type", "displayName": "creative_type", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "status", "displayName": "status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "is_active", "displayName": "is_active", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "days_active", "displayName": "days_active", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [432, 2448],
+      "id": "5c464809-f33a-4ce7-8abe-aaa667855a88",
+      "name": "Save to Sheets",
+      "credentials": {"googleSheetsOAuth2Api": {"id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID", "name": "Renthel"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "const ads = items.map(item => item.json);\nconst now = new Date();\nconst today = String(now.getMonth() + 1).padStart(2, \"0\") + \"/\" + String(now.getDate()).padStart(2, \"0\") + \"/\" + now.getFullYear();\nconst todayAds = ads.filter(ad => ad.first_seen === today).length;\nconst grouped = {};\nads.forEach(ad => {\n  const url = ad.landing_url || \"UNKNOWN\";\n  if (!grouped[url]) { grouped[url] = { page_name: ad.page_name, landing_url: url, ad_count: 0, creatives: new Set(), start_dates: new Set(), ad_url: ad.ad_url }; }\n  grouped[url].ad_count += 1;\n  grouped[url].creatives.add(ad.creative_type);\n  grouped[url].start_dates.add(ad.start_date);\n});\nconst summary = Object.values(grouped).map(item => ({ page_name: item.page_name, landing_url: item.landing_url, ad_count: item.ad_count, creatives: Array.from(item.creatives).join(\", \"), start_dates: Array.from(item.start_dates).join(\", \"), ad_url: item.ad_url }));\nlet message = `NEW ADS SUMMARY\\n\\n`;\nmessage += `Ads Added Today: ${todayAds}\\n`;\nmessage += `Unique Products: ${summary.length}\\n\\n`;\nsummary.forEach((item, index) => {\n  message += `#${index + 1}\\n`;\n  message += `${item.page_name}\\n`;\n  message += `Creatives: ${item.creatives}\\n`;\n  message += `Ads Running: ${item.ad_count}\\n`;\n  message += `Start: ${item.start_dates}\\n`;\n  message += `${item.landing_url}\\n`;\n  message += `${item.ad_url}\\n\\n`;\n});\nreturn [{ json: { message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [688, 2448],
+      "id": "05c627c8-4525-45ba-b406-368c212fd574",
+      "name": "Report Summarizer (New Ads)"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}",
+        "additionalFields": {"appendAttribution": false}
+      },
+      "id": "3f9a1016-3ff6-400c-9abf-4ff301c5a036",
+      "name": "New Ad Added Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [928, 2448],
+      "webhookId": "d1acc4df-4f71-4506-8bcd-df33708663ea",
+      "credentials": {"telegramApi": {"id": "YOUR_TELEGRAM_CREDENTIAL_ID", "name": "Meta Ads Tracker"}}
+    },
+    {
+      "parameters": {"amount": 1, "unit": "minutes"},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [928, 2976],
+      "id": "277e59cd-32ae-4e73-921a-fe856a5b954c",
+      "name": "Wait",
+      "webhookId": "aaac21de-6c1d-43c9-bf43-132e0e16bf38"
+    },
+    {
+      "parameters": {
+        "documentId": {"__rl": true, "value": "YOUR_GOOGLE_SHEET_ID", "mode": "list", "cachedResultName": "Meta Ads Detector", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "ads_db", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-1280, 3296],
+      "id": "ea685648-197e-4a50-a5dc-47911d409685",
+      "name": "Read Database2",
+      "credentials": {"googleSheetsOAuth2Api": {"id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID", "name": "Renthel"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "function parseDate(dateStr) {\n  if (!dateStr) return null;\n  const [month, day, year] = dateStr.split(\"/\");\n  return new Date(Number(year), Number(month) - 1, Number(day));\n}\nconst now = new Date();\nconst today = new Date(now.getFullYear(), now.getMonth(), now.getDate());\nconst todayStr = String(now.getMonth() + 1).padStart(2, \"0\") + \"/\" + String(now.getDate()).padStart(2, \"0\") + \"/\" + now.getFullYear();\nreturn items.map(item => {\n  const data = item.json;\n  const startDate = parseDate(data.start_date);\n  if (!startDate) { return { json: { ...data } }; }\n  const diffTime = today - startDate;\n  const daysActive = Math.floor(diffTime / (1000 * 60 * 60 * 24));\n  return { json: { ...data, last_seen: todayStr, status: \"UPDATED\", days_active: daysActive } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-752, 3296],
+      "id": "4e57cd0a-5dfb-43e4-9e37-40f2e539d215",
+      "name": "Updating the Lapsed Ads",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {"__rl": true, "value": "YOUR_GOOGLE_SHEET_ID", "mode": "list", "cachedResultName": "Meta Ads Detector", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "ads_db", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {"ad_id": "={{ $json.ad_id }}", "days_active": "={{ $json.days_active }}", "last_seen": "={{ $json.last_seen }}", "status": "={{ $json.status }}", "page_name": "={{ $json.page_name }}", "ad_url": "={{ $json.ad_url }}", "landing_url": "={{ $json.landing_url }}", "start_date": "={{ $json.start_date }}", "first_seen": "={{ $json.first_seen }}", "creative_type": "={{ $json.creative_type }}", "is_active": "={{ $json.is_active }}"},
+          "matchingColumns": ["ad_id"],
+          "schema": [
+            {"id": "ad_id", "displayName": "ad_id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "page_name", "displayName": "page_name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "ad_url", "displayName": "ad_url", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "landing_url", "displayName": "landing_url", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "start_date", "displayName": "start_date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "first_seen", "displayName": "first_seen", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "last_seen", "displayName": "last_seen", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "creative_type", "displayName": "creative_type", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "status", "displayName": "status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "is_active", "displayName": "is_active", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "days_active", "displayName": "days_active", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "row_number", "displayName": "row_number", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true, "readOnly": true, "removed": true}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-256, 3296],
+      "id": "18b5843d-d4ab-420b-a06a-f8306d1c5558",
+      "name": "status, last_seen, and days_active UPDATE",
+      "credentials": {"googleSheetsOAuth2Api": {"id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID", "name": "Renthel"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "const ads = items.map(item => item.json);\nconst winningAds = ads.filter(ad => Number(ad.days_active) >= 3);\nif (winningAds.length === 0) { return [{ json: { message: \"No winning ads (3+ days) found today.\" } }]; }\nconst grouped = {};\nwinningAds.forEach(ad => {\n  const url = ad.landing_url;\n  if (!grouped[url]) { grouped[url] = { page_name: ad.page_name, landing_url: url, ad_count: 0, creatives: new Set(), start_dates: new Set(), max_days: 0, ad_url: ad.ad_url }; }\n  grouped[url].ad_count += 1;\n  grouped[url].creatives.add(ad.creative_type);\n  grouped[url].start_dates.add(ad.start_date);\n  const days = Number(ad.days_active);\n  if (days > grouped[url].max_days) { grouped[url].max_days = days; }\n});\nconst summary = Object.values(grouped);\nsummary.sort((a, b) => b.ad_count - a.ad_count);\nlet message = `WINNING ADS (3+ DAYS)\\n\\n`;\nmessage += `Total Winning Products: ${summary.length}\\n\\n`;\nsummary.forEach((item, index) => {\n  const score = item.ad_count >= 5 ? \"***\" : item.ad_count >= 3 ? \"**\" : \"*\";\n  message += `#${index + 1} ${score}\\n`;\n  message += `${item.page_name}\\n`;\n  message += `Days Active: ${item.max_days}\\n`;\n  message += `Ads Running: ${item.ad_count}\\n`;\n  message += `Creatives: ${Array.from(item.creatives).join(\", \")}\\n`;\n  message += `Start: ${Array.from(item.start_dates).join(\", \")}\\n`;\n  message += `${item.landing_url}\\n`;\n  message += `${item.ad_url}\\n\\n`;\n});\nreturn [{ json: { message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [320, 3296],
+      "id": "f223c633-7393-42cb-a4f3-c89d3bf01ebb",
+      "name": "Report Summarizer (Running Ads)"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}",
+        "additionalFields": {"appendAttribution": false}
+      },
+      "id": "cf7bb582-0982-4de7-b87d-370351efe976",
+      "name": "Winning Ads Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [912, 3296],
+      "webhookId": "d1acc4df-4f71-4506-8bcd-df33708663ea",
+      "credentials": {"telegramApi": {"id": "YOUR_TELEGRAM_CREDENTIAL_ID", "name": "Meta Ads Tracker"}}
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {"__rl": true, "value": "YOUR_GOOGLE_SHEET_ID", "mode": "list", "cachedResultName": "Meta Ads Detector", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"},
+        "sheetName": {"__rl": true, "value": 785089717, "mode": "list", "cachedResultName": "Run Logs", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=785089717"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {"date": "={{ $json.date }}", "ads_scraped": "={{ $json.ads_scraped }}", "new_ads_found": "={{ $json.new_ads_found }}", "winning_ads": "={{ $json.winning_ads }}"},
+          "matchingColumns": ["date"],
+          "schema": [
+            {"id": "date", "displayName": "date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "ads_scraped", "displayName": "ads_scraped", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "new_ads_found", "displayName": "new_ads_found", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "winning_ads", "displayName": "winning_ads", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [912, 3552],
+      "id": "ec18ed17-51bb-4ec4-9fc0-56b0d49ba54c",
+      "name": "Run Logs UPDATE",
+      "credentials": {"googleSheetsOAuth2Api": {"id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID", "name": "Renthel"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst today = String(now.getMonth() + 1).padStart(2, \"0\") + \"/\" + String(now.getDate()).padStart(2, \"0\") + \"/\" + now.getFullYear();\nconst scrapedAds = $items(\"Normalize Data\", 0).length;\nconst newAds = $items(\"Filter Node\", 0).length;\nconst rows = $items(\"Read Database2\", 0);\nconst winningAds = rows.reduce((count, row) => {\n  const rawDays = row.json.days_active;\n  const isActive = row.json.is_active;\n  if (!rawDays) return count;\n  const days = parseInt(rawDays, 10);\n  const active = isActive === true || isActive === \"true\" || isActive === 1;\n  if (!isNaN(days) && days > 2 && active) { return count + 1; }\n  return count;\n}, 0);\nreturn [{ json: { date: today, ads_scraped: scrapedAds, new_ads_found: newAds, winning_ads: winningAds } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [320, 3552],
+      "id": "01c645d1-ec32-472b-bb0f-605e93bbe082",
+      "name": "Log Normalizer"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}",
+        "additionalFields": {"appendAttribution": false}
+      },
+      "id": "a0858cf5-9870-40fd-a474-7b99be5c9f50",
+      "name": "New Winners Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [-752, 3600],
+      "webhookId": "d1acc4df-4f71-4506-8bcd-df33708663ea",
+      "credentials": {"telegramApi": {"id": "YOUR_TELEGRAM_CREDENTIAL_ID", "name": "Meta Ads Tracker"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "const ads = items.map(item => item.json);\nconst newWinners = ads.filter(ad => {\n  const days = parseInt(ad.days_active, 10);\n  const notNotified = ad.notified_winner !== true && ad.notified_winner !== \"TRUE\";\n  return (!isNaN(days) && days === 3 && ad.status === \"UPDATED\" && notNotified);\n});\nif (newWinners.length === 0) { return [{ json: { message: \"No new winning ads detected today.\", rows_to_update: [] } }]; }\nconst grouped = {};\nnewWinners.forEach(ad => {\n  const url = ad.landing_url || \"UNKNOWN\";\n  if (!grouped[url]) { grouped[url] = { page_name: ad.page_name, landing_url: url, ad_count: 0, creatives: new Set(), ad_url: ad.ad_url, ad_ids: [] }; }\n  grouped[url].ad_count += 1;\n  grouped[url].creatives.add(ad.creative_type);\n  if (ad.ad_id) { grouped[url].ad_ids.push(ad.ad_id); }\n});\nlet message = `NEW WINNING PRODUCTS (JUST HIT 3 DAYS)\\n\\n`;\nmessage += `Total New Winners: ${Object.keys(grouped).length}\\n\\n`;\nObject.values(grouped).forEach((item, index) => {\n  message += `#${index + 1}\\n`;\n  message += `${item.page_name}\\n`;\n  message += `Ads Running: ${item.ad_count}\\n`;\n  message += `Creatives: ${Array.from(item.creatives).join(\", \")}\\n`;\n  message += `${item.landing_url}\\n`;\n  message += `${item.ad_url}\\n\\n`;\n});\nreturn [{ json: { message, ads_to_update: Object.values(grouped).flatMap(g => g.ad_ids) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1280, 3808],
+      "id": "debfc650-163c-4abe-9ec2-46f07c44bc6a",
+      "name": "New Ad Winners Parser"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {"__rl": true, "value": "YOUR_GOOGLE_SHEET_ID", "mode": "list", "cachedResultName": "Meta Ads Detector", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "ads_db", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {"ad_id": "={{ $json.ad_id }}", "status": "WINNING AD"},
+          "matchingColumns": ["ad_id"],
+          "schema": [
+            {"id": "ad_id", "displayName": "ad_id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "status", "displayName": "status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [912, 3792],
+      "id": "0720ba4d-e5d6-420c-b830-5ee9ff6d8fa1",
+      "name": "Append or update row in sheet",
+      "credentials": {"googleSheetsOAuth2Api": {"id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID", "name": "Renthel"}}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3},
+          "conditions": [{"id": "8c0a162d-19f2-4e7e-a53f-529497d77a3a", "leftValue": "={{ $json.notified_winner }}", "rightValue": "true", "operator": {"type": "boolean", "operation": "true", "singleValue": true}}],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [320, 3808],
+      "id": "f5b5bd2c-5cfb-4662-9b40-4398ea316d53",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ads = items[0]?.json?.ads_to_update || [];\nif (ads.length === 0) { return [{ json: { skip: true } }]; }\nreturn ads.map(adId => ({ json: { ad_id: adId, notified_winner: true } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-752, 3808],
+      "id": "cc98958a-2e9b-4b5b-8745-f9925dee0e15",
+      "name": "New Winner Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Scrape Meta Ads Apify1": {"main": [[{"node": "Wait 2 Mins", "type": "main", "index": 0}]]},
+    "Daily Scraping - Run 9:00 AM": {"main": [[{"node": "Meta Ads URL", "type": "main", "index": 0}, {"node": "Read Database", "type": "main", "index": 0}]]},
+    "Meta Ads URL": {"main": [[{"node": "URL Merger", "type": "main", "index": 0}]]},
+    "Read Database": {"main": [[{"node": "Dataset Merger", "type": "main", "index": 0}]]},
+    "URL Merger": {"main": [[{"node": "Scrape Meta Ads Apify1", "type": "main", "index": 0}]]},
+    "Wait 2 Mins": {"main": [[{"node": "GET Apify Latest Run Dataset", "type": "main", "index": 0}]]},
+    "GET Apify Latest Run Dataset": {"main": [[{"node": "Normalize Data", "type": "main", "index": 0}]]},
+    "Normalize Data": {"main": [[{"node": "Dataset Merger", "type": "main", "index": 1}]]},
+    "Dataset Merger": {"main": [[{"node": "Filter Node", "type": "main", "index": 0}]]},
+    "Filter Node": {"main": [[{"node": "New Ad Detected?", "type": "main", "index": 0}]]},
+    "New Ad Detected?": {"main": [[{"node": "Save to Sheets", "type": "main", "index": 0}], [{"node": "No New Ads Alert", "type": "main", "index": 0}]]},
+    "No New Ads Alert": {"main": [[{"node": "Wait", "type": "main", "index": 0}]]},
+    "Save to Sheets": {"main": [[{"node": "Report Summarizer (New Ads)", "type": "main", "index": 0}]]},
+    "Report Summarizer (New Ads)": {"main": [[{"node": "New Ad Added Alert", "type": "main", "index": 0}]]},
+    "New Ad Added Alert": {"main": [[{"node": "Wait", "type": "main", "index": 0}]]},
+    "Wait": {"main": [[{"node": "Read Database2", "type": "main", "index": 0}]]},
+    "Read Database2": {"main": [[{"node": "Updating the Lapsed Ads", "type": "main", "index": 0}]]},
+    "Updating the Lapsed Ads": {"main": [[{"node": "status, last_seen, and days_active UPDATE", "type": "main", "index": 0}]]},
+    "status, last_seen, and days_active UPDATE": {"main": [[{"node": "Report Summarizer (Running Ads)", "type": "main", "index": 0}, {"node": "Log Normalizer", "type": "main", "index": 0}, {"node": "New Ad Winners Parser", "type": "main", "index": 0}]]},
+    "Report Summarizer (Running Ads)": {"main": [[{"node": "Winning Ads Alert", "type": "main", "index": 0}]]},
+    "Log Normalizer": {"main": [[{"node": "Run Logs UPDATE", "type": "main", "index": 0}]]},
+    "Winning Ads Alert": {"main": [[]]},
+    "New Ad Winners Parser": {"main": [[{"node": "New Winners Alert", "type": "main", "index": 0}, {"node": "New Winner Parser", "type": "main", "index": 0}]]},
+    "New Winners Alert": {"main": [[]]},
+    "If": {"main": [[{"node": "Append or update row in sheet", "type": "main", "index": 0}], []]},
+    "New Winner Parser": {"main": [[{"node": "If", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "YOUR_ERROR_WORKFLOW_ID"
+  },
+  "versionId": "2fff47a4-da8d-46e7-a625-181ff4cfc3fa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED"
+  },
+  "id": "cRuodqYP21tIeZSY",
+  "tags": []
+}
