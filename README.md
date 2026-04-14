@@ -4,9 +4,9 @@ An end-to-end automated competitor ad intelligence pipeline built with n8n. Scra
 
 ## What the System Does
 
-A single workflow that runs on a daily schedule with two sequential flows:
+This is a two-workflow system:
 
-### 1. Main Workflow (`Competitor Product Intelligence System - META ADS.json`)
+### 1. Main Workflow (`workflows/Competitor Product Intelligence System - META ADS.json`)
 
 Runs every morning at 9:00 AM with two sequential flows:
 
@@ -30,9 +30,9 @@ Runs every morning at 9:00 AM with two sequential flows:
   - **Run Log** — writes today's scrape stats (total scraped, new found, winning count) to a separate `Run Logs` sheet
   - **New Winner Alert** — detects ads that just crossed the 3-day threshold for the first time (not yet notified), sends a dedicated "new winner" alert to Telegram, and marks them as `notified_winner: true` in the sheet
 
-### 2. Error Handler (built-in)
+### 2. Error Handler (`workflows/competitor-error-handler.json`)
 
-Attached to the main workflow via `settings.errorWorkflow`:
+Attaches to the main workflow as an error workflow via `settings.errorWorkflow`:
 - Captures execution errors from any failed node
 - Formats a structured alert with: workflow name, failed node, error message, execution ID, and timestamp
 - Sends the alert immediately to Telegram
@@ -90,7 +90,7 @@ The workflow sends up to five messages per daily run:
 
 ### Step 1 — Replace Placeholders
 
-Before importing, search and replace all placeholders in the JSON file:
+Before importing, search and replace all placeholders in both JSON files:
 
 | Placeholder | Replace With |
 |-------------|-------------|
@@ -99,6 +99,7 @@ Before importing, search and replace all placeholders in the JSON file:
 | `YOUR_TELEGRAM_CHAT_ID` | Your Telegram user or group chat ID |
 | `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID` | n8n Google Sheets OAuth2 credential ID |
 | `YOUR_TELEGRAM_CREDENTIAL_ID` | n8n Telegram credential ID |
+| `YOUR_ERROR_WORKFLOW_ID` | The n8n workflow ID of the Error Handler (assigned after import) |
 
 ### Step 2 — Set Up Credentials in n8n
 
@@ -119,7 +120,7 @@ Create a Google Sheet named **Meta Ads Detector** with two tabs:
 1. Go to [Apify Console](https://console.apify.com) and sign up
 2. Find the **Facebook Ads Library Scraper** actor by `curious_coder`
 3. Copy your API token from **Settings → Integrations → API token**
-4. Replace `YOUR_APIFY_API_TOKEN` in both HTTP Request nodes
+4. Replace `YOUR_APIFY_API_TOKEN` in both HTTP Request nodes in the main workflow
 
 ### Step 5 — Set Your Target URLs
 
@@ -131,12 +132,18 @@ In the **Meta Ads URL** Set node, update the URL entries with your actual Meta A
 
 You can add, remove, or rename as many URL entries as needed — the URL Merger node handles any number dynamically.
 
-### Step 6 — Import and Activate
+### Step 6 — Import Workflows
 
 1. In n8n, go to **Workflows → Import from File**
-2. Import `Competitor Product Intelligence System - META ADS.json`
-3. Reconnect all credentials in each node
-4. Activate the workflow
+2. Import `competitor-error-handler.json` first
+3. Note the workflow ID assigned to the Error Handler (visible in the URL after opening it)
+4. Replace `YOUR_ERROR_WORKFLOW_ID` in the main workflow JSON with that ID
+5. Import `Competitor Product Intelligence System - META ADS.json`
+6. Reconnect all credentials in each node
+
+### Step 7 — Activate
+
+Activate the **Error Handler** first, then the **Main Workflow**.
 
 ## How the Winner Detection Works
 
@@ -165,6 +172,8 @@ The daily **Winning Ads Leaderboard** shows all currently active ads at 3+ days 
 
 ```
 /
-├── Competitor Product Intelligence System - META ADS.json   # Full workflow with error handler
+├── workflows/
+│   ├── Competitor Product Intelligence System - META ADS.json   # Main scraping, detection, and winner tracking workflow
+│   └── competitor-error-handler.json                            # Error monitoring and Telegram alert workflow
 └── README.md
 ```
